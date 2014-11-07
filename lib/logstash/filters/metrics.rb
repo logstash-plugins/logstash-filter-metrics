@@ -8,7 +8,7 @@ require "logstash/namespace"
 # For example, if you have a field 'response' that is
 # a http response code, and you want to count each
 # kind of response, you can do this:
-#
+# [source,ruby]
 #     filter {
 #       metrics {
 #         meter => [ "http.%{response}" ]
@@ -54,7 +54,7 @@ require "logstash/namespace"
 #
 # For a simple example, let's track how many events per second are running
 # through logstash:
-#
+# [source,ruby]
 #     input {
 #       generator {
 #         type => "generated"
@@ -82,7 +82,7 @@ require "logstash/namespace"
 #     }
 #
 # Running the above:
-#
+# [source,ruby]
 #     % bin/logstash -f example.conf
 #     rate: 23721.983566819246
 #     rate: 24811.395722536377
@@ -93,7 +93,7 @@ require "logstash/namespace"
 #
 # In the real world, you would emit this to graphite or another metrics store,
 # like so:
-#
+# [source,ruby]
 #     output {
 #       graphite {
 #         metrics => [ "events.rate_1m", "%{events.rate_1m}" ]
