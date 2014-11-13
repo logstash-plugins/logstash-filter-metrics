@@ -174,7 +174,7 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
     end
   end # def filter
 
-  def flush
+  def flush(options = {})
     # Add 5 seconds to @last_flush and @last_clear counters
     # since this method is called every 5 seconds.
     @last_flush.update { |v| v + 5 }
