@@ -128,6 +128,10 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
   # The flush interval, when the metrics event is created. Must be a multiple of 5s.
   config :flush_interval, :validate => :number, :default => 5
 
+  # Call the filter flush method at regular interval.
+  # Optional.
+  config :periodic_flush, :validate => :boolean, :default => true
+
   # The clear interval, when all counter are reset.
   #
   # If set to -1, the default value, the metrics will never be cleared.
