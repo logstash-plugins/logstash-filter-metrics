@@ -101,7 +101,6 @@ require "logstash/namespace"
 #     }
 class LogStash::Filters::Metrics < LogStash::Filters::Base
   config_name "metrics"
-  milestone 1
 
   # syntax: `meter => [ "name of metric", "name of metric" ]`
   config :meter, :validate => :array, :default => []
