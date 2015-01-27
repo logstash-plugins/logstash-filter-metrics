@@ -218,7 +218,17 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
     return [event]
   end
 
+  # this is a temporary fix to enable periodic flushes without using the plugin config:
+  #   config :periodic_flush, :validate => :boolean, :default => true
+  # because this is not optional here and should not be configurable.
+  # this is until we refactor the periodic_flush mechanism per
+  # https://github.com/elasticsearch/logstash/issues/1839
+  def periodic_flush
+    true
+  end
+
   private
+
   def flush_rates(event, name, metric)
       event["#{name}.count"] = metric.count
       event["#{name}.rate_1m"] = metric.one_minute_rate if @rates.include? 1
