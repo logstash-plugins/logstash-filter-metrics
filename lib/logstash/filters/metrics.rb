@@ -55,6 +55,7 @@ require "logstash/namespace"
 # For a simple example, let's track how many events per second are running
 # through logstash:
 # [source,ruby]
+# ----
 #     input {
 #       generator {
 #         type => "generated"
@@ -80,6 +81,7 @@ require "logstash/namespace"
 #         }
 #       }
 #     }
+# ----
 #
 # Running the above:
 # [source,ruby]
