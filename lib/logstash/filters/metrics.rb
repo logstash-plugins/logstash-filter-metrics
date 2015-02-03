@@ -183,7 +183,8 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
     return unless should_flush?
 
     event = LogStash::Event.new
-    event["message"] = Socket.gethostname
+    # on windows, jruby will output hostname in host encoding instead of UTF-8
+    event["message"] = Socket.gethostname.force_encoding("UTF-8")
     @metric_meters.each_pair do |name, metric|
       flush_rates event, name, metric
       metric.clear if should_clear?
