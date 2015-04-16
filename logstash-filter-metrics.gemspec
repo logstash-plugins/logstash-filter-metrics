@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
 
   s.name            = 'logstash-filter-metrics'
-  s.version         = '0.1.6'
+  s.version         = '0.1.7'
   s.licenses        = ['Apache License (2.0)']
   s.summary         = "The metrics filter is useful for aggregating metrics."
   s.description     = "This gem is a logstash plugin required to be installed on top of the Logstash core pipeline using $LS_HOME/bin/plugin install gemname. This gem is not a stand-alone program"
@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
   # Gem dependencies
   s.add_runtime_dependency "logstash-core", '>= 1.4.0', '< 2.0.0'
   s.add_runtime_dependency "metriks"                          #(MIT license)
+  s.add_runtime_dependency "thread_safe"
 
   s.add_development_dependency 'logstash-devutils'
 end
