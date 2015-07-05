@@ -183,7 +183,7 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
   end # def make_event
 
   def get_event(events)
-    if split_metrics
+    if split_metrics or events.empty?
       events << make_event
     end
 
@@ -199,7 +199,7 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
     # Do nothing if there's nothing to do ;)
     return unless should_flush?
 
-    events = [make_event]
+    events = []
     @metric_meters.each_pair do |name, metric|
       flush_rates get_event(events), name, metric
       metric.clear if should_clear?

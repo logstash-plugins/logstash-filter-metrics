@@ -58,6 +58,35 @@ describe LogStash::Filters::Metrics do
           insist { events.first["http.404.count"] } == 1
         end
       end
+
+      context "[split_metrics] on the first flush" do
+        subject {
+          config = {"meter" => ["http.%{response}"], "split_metrics" => true}
+          filter = LogStash::Filters::Metrics.new config
+          filter.register
+          filter.filter LogStash::Event.new({"response" => 200})
+          filter.filter LogStash::Event.new({"response" => 200})
+          filter.filter LogStash::Event.new({"response" => 404})
+          filter.flush
+        }
+
+        it "should flush counts in separate messages" do
+          insist { subject.length } == 2
+          insist { subject.last["http.200.count"] } == 2
+          insist { subject.first["http.404.count"] } == 1
+        end
+
+        it "should include rates and percentiles in separate messages" do
+          metrics = ["http.200.rate_1m", "http.200.rate_5m", "http.200.rate_15m"]
+          metrics.each do |metric|
+            insist { subject.last }.include? metric
+          end
+          metrics = ["http.404.rate_1m", "http.404.rate_5m", "http.404.rate_15m"]
+          metrics.each do |metric|
+            insist { subject.first }.include? metric
+          end
+        end
+      end
     end
 
     context "when custom rates and percentiles are selected" do
