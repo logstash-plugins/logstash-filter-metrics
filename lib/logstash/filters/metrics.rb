@@ -158,7 +158,7 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
   end # def register
 
   def filter(event)
-    return unless filter?(event)
+    
 
     # TODO(piavlo): This should probably be moved to base filter class.
     if @ignore_older_than > 0 && Time.now - event.timestamp.time > @ignore_older_than
