@@ -220,6 +220,27 @@ describe LogStash::Filters::Metrics do
     end
   end
 
+  context "when split is set" do
+    context "on the first flush" do
+      subject {
+        config = {"meter" => ["%{tags}"], "split" => true }
+        filter = LogStash::Filters::Metrics.new config
+        filter.register
+        filter.filter LogStash::Event.new({"tags" => [200]})
+        filter.filter LogStash::Event.new({"tags" => [200,400]})
+        filter.filter LogStash::Event.new({"tags" => 404})
+        filter.flush
+      }
+
+      it "should flush counts" do
+        insist { subject.length } == 1
+        insist { subject.first["200.count"] } == 2
+        insist { subject.first["400.count"] } == 1
+        insist { subject.first["404.count"] } == 1
+      end
+    end
+  end
+
   context "when invalid rates are set" do
     subject {
       config = {"meter" => ["http.%{response}"], "rates" => [90]}
