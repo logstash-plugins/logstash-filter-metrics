@@ -189,7 +189,7 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
 
     @meter.each do |m|
       if (@split)
-        m = event.sprintf(m).split(@split_seperator)
+        m = event.sprintf(m).to_s().split(@split_seperator)
 
         m.each do |value|
           @metric_meters[value].mark
