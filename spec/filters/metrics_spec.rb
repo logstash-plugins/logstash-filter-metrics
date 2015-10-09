@@ -86,26 +86,36 @@ describe LogStash::Filters::Metrics do
 
   context "with multiple instances" do
     it "counts should be independent" do
-      config_tag1 = {"meter" => ["http.%{response}"], "tags" => ["tag1"]}
-      config_tag2 = {"meter" => ["http.%{response}"], "tags" => ["tag2"]}
-      filter_tag1 = LogStash::Filters::Metrics.new config_tag1
-      filter_tag2 = LogStash::Filters::Metrics.new config_tag2
-      event_tag1 = LogStash::Event.new({"response" => 200, "tags" => [ "tag1" ]})
-      event_tag2 = LogStash::Event.new({"response" => 200, "tags" => [ "tag2" ]})
-      event2_tag2 = LogStash::Event.new({"response" => 200, "tags" => [ "tag2" ]})
-      filter_tag1.register
-      filter_tag2.register
+      config1 = {"meter" => ["http.%{response}"]}
+      config2 = {"meter" => ["http.%{response}"]}
+      filter1 = LogStash::Filters::Metrics.new config1
+      filter2 = LogStash::Filters::Metrics.new config2
+      events1 = [
+        LogStash::Event.new({"response" => 200}),
+        LogStash::Event.new({"response" => 404})
+      ]
+      events2 = [
+        LogStash::Event.new({"response" => 200}),
+        LogStash::Event.new({"response" => 200})
+      ]
+      filter1.register
+      filter2.register
 
-      [event_tag1, event_tag2, event2_tag2].each do |event|
-        filter_tag1.filter event
-        filter_tag2.filter event
+      events1.each do |event|
+        filter1.filter event
       end
 
-      events_tag1 = filter_tag1.flush
-      events_tag2 = filter_tag2.flush
+      events2.each do |event|
+        filter2.filter event
+      end
 
-      insist { events_tag1.first["http.200.count"] } == 1
-      insist { events_tag2.first["http.200.count"] } == 2
+      events1 = filter1.flush
+      events2 = filter2.flush
+
+      insist { events1.first["http.200.count"] } == 1
+      insist { events2.first["http.200.count"] } == 2
+      insist { events1.first["http.404.count"] } == 1
+      insist { events2.first["http.404.count"] } == nil
     end
   end
 
