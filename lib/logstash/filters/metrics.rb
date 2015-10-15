@@ -27,33 +27,34 @@ require "logstash/namespace"
 # The event that is flushed will include every 'meter' and 'timer'
 # metric in the following way:
 #
-# #### 'meter' values
+# ==== 'meter' values
 #
 # For a `meter => "something"` you will receive the following fields:
 #
-# * "thing.count" - the total count of events
-# * "thing.rate_1m" - the 1-minute rate (sliding)
-# * "thing.rate_5m" - the 5-minute rate (sliding)
-# * "thing.rate_15m" - the 15-minute rate (sliding)
+# * `thing.count` - the total count of events
+# * `thing.rate_1m` - the 1-minute rate (sliding)
+# * `thing.rate_5m` - the 5-minute rate (sliding)
+# * `thing.rate_15m` - the 15-minute rate (sliding)
 #
-# #### 'timer' values
+# ==== 'timer' values
 #
-# For a `timer => [ "thing", "%{duration}" ]` you will receive the following fields:
+# For a `timer => { "thing" => "%{duration}" }` you will receive the following fields:
 #
-# * "thing.count" - the total count of events
-# * "thing.rate_1m" - the 1-minute rate of events (sliding)
-# * "thing.rate_5m" - the 5-minute rate of events (sliding)
-# * "thing.rate_15m" - the 15-minute rate of events (sliding)
-# * "thing.min" - the minimum value seen for this metric
-# * "thing.max" - the maximum value seen for this metric
-# * "thing.stddev" - the standard deviation for this metric
-# * "thing.mean" - the mean for this metric
-# * "thing.pXX" - the XXth percentile for this metric (see `percentiles`)
+# * `thing.count` - the total count of events
+# * `thing.rate_1m` - the 1-minute rate of events (sliding)
+# * `thing.rate_5m` - the 5-minute rate of events (sliding)
+# * `thing.rate_15m` - the 15-minute rate of events (sliding)
+# * `thing.min` - the minimum value seen for this metric
+# * `thing.max` - the maximum value seen for this metric
+# * `thing.stddev` - the standard deviation for this metric
+# * `thing.mean` - the mean for this metric
+# * `thing.pXX` - the XXth percentile for this metric (see `percentiles`)
 #
-# #### Example: computing event rate
+# ==== Example: computing event rate
 #
 # For a simple example, let's track how many events per second are running
 # through logstash:
+#
 # [source,ruby]
 # ----
 #     input {
@@ -83,7 +84,9 @@ require "logstash/namespace"
 #     }
 # ----
 #
+#
 # Running the above:
+#
 # [source,ruby]
 #     % bin/logstash -f example.conf
 #     rate: 23721.983566819246
@@ -103,11 +106,12 @@ require "logstash/namespace"
 #     }
 class LogStash::Filters::Metrics < LogStash::Filters::Base
   config_name "metrics"
+  milestone 1
 
-  # syntax: `meter => [ "name of metric", "name of metric" ]`
+  # `meter => [ "name of metric", "name of metric" ]`
   config :meter, :validate => :array, :default => []
 
-  # syntax: `timer => [ "name of metric", "%{time_value}" ]`
+  # `timer => { "name of metric" => "%{time_value}" }`
   config :timer, :validate => :hash, :default => {}
 
   # Don't track events that have @timestamp older than some number of seconds.
