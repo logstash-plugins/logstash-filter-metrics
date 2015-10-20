@@ -5,13 +5,18 @@ require "logstash/namespace"
 
 # The metrics filter is useful for aggregating metrics.
 #
+# IMPORTANT: Elasticsearch 2.0 no longer allows field names with dots. Version 3.0
+# of the metrics filter plugin changes behavior to use nested fields rather than
+# dotted notation to avoid colliding with versions of Elasticsearch 2.0+.  Please
+# note the changes in the documentation (underscores and sub-fields used).
+#
 # For example, if you have a field 'response' that is
 # a http response code, and you want to count each
 # kind of response, you can do this:
 # [source,ruby]
 #     filter {
 #       metrics {
-#         meter => [ "http.%{response}" ]
+#         meter => [ "http_%{response}" ]
 #         add_tag => "metric"
 #       }
 #     }
@@ -31,24 +36,24 @@ require "logstash/namespace"
 #
 # For a `meter => "something"` you will receive the following fields:
 #
-# * "thing.count" - the total count of events
-# * "thing.rate_1m" - the 1-minute rate (sliding)
-# * "thing.rate_5m" - the 5-minute rate (sliding)
-# * "thing.rate_15m" - the 15-minute rate (sliding)
+# * "[thing][count]" - the total count of events
+# * "[thing][rate_1m]" - the 1-minute rate (sliding)
+# * "[thing][rate_5m]" - the 5-minute rate (sliding)
+# * "[thing][rate_15m]" - the 15-minute rate (sliding)
 #
 # #### 'timer' values
 #
 # For a `timer => [ "thing", "%{duration}" ]` you will receive the following fields:
 #
-# * "thing.count" - the total count of events
-# * "thing.rate_1m" - the 1-minute rate of events (sliding)
-# * "thing.rate_5m" - the 5-minute rate of events (sliding)
-# * "thing.rate_15m" - the 15-minute rate of events (sliding)
-# * "thing.min" - the minimum value seen for this metric
-# * "thing.max" - the maximum value seen for this metric
-# * "thing.stddev" - the standard deviation for this metric
-# * "thing.mean" - the mean for this metric
-# * "thing.pXX" - the XXth percentile for this metric (see `percentiles`)
+# * "[thing][count]" - the total count of events
+# * "[thing][rate_1m]" - the 1-minute rate of events (sliding)
+# * "[thing][rate_5m]" - the 5-minute rate of events (sliding)
+# * "[thing][rate_15m]" - the 15-minute rate of events (sliding)
+# * "[thing][min]" - the minimum value seen for this metric
+# * "[thing][max]" - the maximum value seen for this metric
+# * "[thing][stddev]" - the standard deviation for this metric
+# * "[thing][mean]" - the mean for this metric
+# * "[thing][pXX]" - the XXth percentile for this metric (see `percentiles`)
 #
 # #### Example: computing event rate
 #
@@ -76,7 +81,7 @@ require "logstash/namespace"
 #       if "metric" in [tags] {
 #         stdout {
 #           codec => line {
-#             format => "rate: %{events.rate_1m}"
+#             format => "rate: %{[events][rate_1m]}"
 #           }
 #         }
 #       }
@@ -98,7 +103,7 @@ require "logstash/namespace"
 # [source,ruby]
 #     output {
 #       graphite {
-#         metrics => [ "events.rate_1m", "%{events.rate_1m}" ]
+#         metrics => [ "events.rate_1m", "%{[events][rate_1m]}" ]
 #       }
 #     }
 class LogStash::Filters::Metrics < LogStash::Filters::Base
@@ -158,7 +163,7 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
   end # def register
 
   def filter(event)
-    
+
 
     # TODO(piavlo): This should probably be moved to base filter class.
     if @ignore_older_than > 0 && Time.now - event.timestamp.time > @ignore_older_than
@@ -194,14 +199,14 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
     @metric_timers.each_pair do |name, metric|
       flush_rates event, name, metric
       # These 4 values are not sliding, so they probably are not useful.
-      event["#{name}.min"] = metric.min
-      event["#{name}.max"] = metric.max
+      event["[#{name}][min]"] = metric.min
+      event["[#{name}][max]"] = metric.max
       # timer's stddev currently returns variance, fix it.
-      event["#{name}.stddev"] = metric.stddev ** 0.5
-      event["#{name}.mean"] = metric.mean
+      event["[#{name}][stddev]"] = metric.stddev ** 0.5
+      event["[#{name}][mean]"] = metric.mean
 
       @percentiles.each do |percentile|
-        event["#{name}.p#{percentile}"] = metric.snapshot.value(percentile / 100.0)
+        event["[#{name}][p#{percentile}]"] = metric.snapshot.value(percentile / 100.0)
       end
       metric.clear if should_clear?
     end
@@ -232,10 +237,10 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
   private
 
   def flush_rates(event, name, metric)
-      event["#{name}.count"] = metric.count
-      event["#{name}.rate_1m"] = metric.one_minute_rate if @rates.include? 1
-      event["#{name}.rate_5m"] = metric.five_minute_rate if @rates.include? 5
-      event["#{name}.rate_15m"] = metric.fifteen_minute_rate if @rates.include? 15
+      event["[#{name}][count]"] = metric.count
+      event["[#{name}][rate_1m]"] = metric.one_minute_rate if @rates.include? 1
+      event["[#{name}][rate_5m]"] = metric.five_minute_rate if @rates.include? 5
+      event["[#{name}][rate_15m]"] = metric.fifteen_minute_rate if @rates.include? 15
   end
 
   def metric_key(key)
