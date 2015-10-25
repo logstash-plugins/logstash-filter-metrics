@@ -34,7 +34,7 @@ require "logstash/namespace"
 #
 # #### 'meter' values
 #
-# For a `meter => "something"` you will receive the following fields:
+# For a `meter => "thing"` you will receive the following fields:
 #
 # * "[thing][count]" - the total count of events
 # * "[thing][rate_1m]" - the 1-minute rate (sliding)
