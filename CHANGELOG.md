@@ -1,3 +1,5 @@
+# 3.0.1
+  - New dependency requirements for logstash-core for the 5.0 release
 ## 3.0.0
  - Elasticsearch 2.0 does not allow for dots in field names.  This change changes to use sub-field syntax instead of
  dotted syntax.  This is a breaking change.
