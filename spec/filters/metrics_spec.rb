@@ -29,8 +29,8 @@ describe LogStash::Filters::Metrics do
 
         it "should flush counts" do
           insist { subject.length } == 1
-          insist { subject.first["http_200"]["count"] } == 2
-          insist { subject.first["http_404"]["count"] } == 1
+          insist { subject.first.get("http_200")["count"] } == 2
+          insist { subject.first.get("http_404")["count"] } == 1
         end
 
         it "should include rates and percentiles" do
@@ -38,7 +38,7 @@ describe LogStash::Filters::Metrics do
           rates = [ "rate_1m", "rate_5m", "rate_15m" ]
           meters.each do |meter|
             rates.each do |rate|
-              insist { subject.first[meter] }.include? rate
+              insist { subject.first.get(meter) }.include? rate
             end
           end
         end
@@ -56,8 +56,8 @@ describe LogStash::Filters::Metrics do
           events = filter.flush
           events = filter.flush
           insist { events.length } == 1
-          insist { events.first["http_200"]["count"] } == 2
-          insist { events.first["http_404"]["count"] } == 1
+          insist { events.first.get("http_200")["count"] } == 2
+          insist { events.first.get("http_404")["count"] } == 1
         end
       end
     end
@@ -78,7 +78,7 @@ describe LogStash::Filters::Metrics do
         }
 
         it "should include only the requested rates" do
-          rate_fields = subject.first["http_200"].to_hash.keys.select {|field| field.start_with?("rate") }
+          rate_fields = subject.first.get("http_200").to_hash.keys.select {|field| field.start_with?("rate") }
           insist { rate_fields.length } == 1
           insist { rate_fields }.include? "rate_1m"
         end
@@ -114,10 +114,10 @@ describe LogStash::Filters::Metrics do
       events1 = filter1.flush
       events2 = filter2.flush
 
-      insist { events1.first["http_200"]["count"] } == 1
-      insist { events2.first["http_200"]["count"] } == 2
-      insist { events1.first["http_404"]["count"] } == 1
-      insist { events2.first["http_404"] } == nil
+      insist { events1.first.get("http_200")["count"] } == 1
+      insist { events2.first.get("http_200")["count"] } == 2
+      insist { events1.first.get("http_404")["count"] } == 1
+      insist { events2.first.get("http_404") } == nil
     end
   end
 
@@ -135,34 +135,34 @@ describe LogStash::Filters::Metrics do
 
       it "should flush counts" do
         insist { subject.length } == 1
-        insist { subject.first["http_request_time"]["count"] } == 3
+        insist { subject.first.get("http_request_time")["count"] } == 3
       end
 
       it "should include rates and percentiles keys" do
         metrics = ["rate_1m", "rate_5m", "rate_15m", "p1", "p5", "p10", "p90", "p95", "p99"]
         metrics.each do |metric|
-          insist { subject.first["http_request_time"] }.include? metric
+          insist { subject.first.get("http_request_time") }.include? metric
         end
       end
 
       it "should include min value" do
-        insist { subject.first['http_request_time']['min'] } == 10.0
+        insist { subject.first.get("http_request_time")['min'] } == 10.0
       end
 
       it "should include mean value" do
-        insist { subject.first['http_request_time']['mean'] } == 20.0
+        insist { subject.first.get("http_request_time")['mean'] } == 20.0
       end
 
       it "should include stddev value" do
-        insist { subject.first['http_request_time']['stddev'] } == Math.sqrt(10.0)
+        insist { subject.first.get("http_request_time")['stddev'] } == Math.sqrt(10.0)
       end
 
       it "should include max value" do
-        insist { subject.first['http_request_time']['max'] } == 30.0
+        insist { subject.first.get("http_request_time")['max'] } == 30.0
       end
 
       it "should include percentile value" do
-        insist { subject.first['http_request_time']['p99'] } == 30.0
+        insist { subject.first.get("http_request_time")['p99'] } == 30.0
       end
     end
   end
@@ -183,17 +183,17 @@ describe LogStash::Filters::Metrics do
 
       it "should flush counts" do
         insist { subject.length } == 1
-        insist { subject.first["http_request_time"]["count"] } == 1
+        insist { subject.first.get("http_request_time")["count"] } == 1
       end
 
       it "should include only the requested rates" do
-        rate_fields = subject.first["http_request_time"].to_hash.keys.select {|field| field.start_with?("rate") }
+        rate_fields = subject.first.get("http_request_time").to_hash.keys.select {|field| field.start_with?("rate") }
         insist { rate_fields.length } == 1
         insist { rate_fields }.include? "rate_1m"
       end
 
       it "should include only the requested percentiles" do
-        percentile_fields = subject.first["http_request_time"].to_hash.keys.select {|field| field.start_with?("p") }
+        percentile_fields = subject.first.get("http_request_time").to_hash.keys.select {|field| field.start_with?("p") }
         insist { percentile_fields.length } == 2
         insist { percentile_fields }.include? "p1"
         insist { percentile_fields }.include? "p2"
@@ -225,9 +225,9 @@ describe LogStash::Filters::Metrics do
       filter.register
       filter.filter LogStash::Event.new({"response" => 200})
 
-      insist { filter.flush.first["http_200"]["count"] } == 1 # 5s
-      insist { filter.flush.first["http_200"]["count"] } == 1 # 10s
-      insist { filter.flush.first["http_200"]["count"] } == 1 # 15s
+      insist { filter.flush.first.get("http_200")["count"] } == 1 # 5s
+      insist { filter.flush.first.get("http_200")["count"] } == 1 # 10s
+      insist { filter.flush.first.get("http_200")["count"] } == 1 # 15s
       insist { filter.flush }.nil?                         # 20s
     end
   end

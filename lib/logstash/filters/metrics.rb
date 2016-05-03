@@ -190,7 +190,7 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
     return unless should_flush?
 
     event = LogStash::Event.new
-    event["message"] = Socket.gethostname
+    event.set("message", Socket.gethostname)
     @metric_meters.each_pair do |name, metric|
       flush_rates event, name, metric
       metric.clear if should_clear?
@@ -199,14 +199,14 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
     @metric_timers.each_pair do |name, metric|
       flush_rates event, name, metric
       # These 4 values are not sliding, so they probably are not useful.
-      event["[#{name}][min]"] = metric.min
-      event["[#{name}][max]"] = metric.max
+      event.set("[#{name}][min]", metric.min)
+      event.set("[#{name}][max]", metric.max)
       # timer's stddev currently returns variance, fix it.
-      event["[#{name}][stddev]"] = metric.stddev ** 0.5
-      event["[#{name}][mean]"] = metric.mean
+      event.set("[#{name}][stddev]", metric.stddev ** 0.5)
+      event.set("[#{name}][mean]", metric.mean)
 
       @percentiles.each do |percentile|
-        event["[#{name}][p#{percentile}]"] = metric.snapshot.value(percentile / 100.0)
+        event.set("[#{name}][p#{percentile}]", metric.snapshot.value(percentile / 100.0))
       end
       metric.clear if should_clear?
     end
@@ -237,10 +237,10 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
   private
 
   def flush_rates(event, name, metric)
-      event["[#{name}][count]"] = metric.count
-      event["[#{name}][rate_1m]"] = metric.one_minute_rate if @rates.include? 1
-      event["[#{name}][rate_5m]"] = metric.five_minute_rate if @rates.include? 5
-      event["[#{name}][rate_15m]"] = metric.fifteen_minute_rate if @rates.include? 15
+      event.set("[#{name}][count]", metric.count)
+      event.set("[#{name}][rate_1m]", metric.one_minute_rate) if @rates.include? 1
+      event.set("[#{name}][rate_5m]", metric.five_minute_rate) if @rates.include? 5
+      event.set("[#{name}][rate_15m]", metric.fifteen_minute_rate) if @rates.include? 15
   end
 
   def metric_key(key)
