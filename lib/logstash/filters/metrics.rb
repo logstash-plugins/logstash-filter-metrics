@@ -32,7 +32,7 @@ require "logstash/namespace"
 # The event that is flushed will include every 'meter' and 'timer'
 # metric in the following way:
 #
-# ==== 'meter' values
+# ==== `meter` values
 #
 # For a `meter => "something"` you will receive the following fields:
 #
@@ -41,7 +41,7 @@ require "logstash/namespace"
 # * "[thing][rate_5m]" - the per-second event rate in a 5-minute sliding window
 # * "[thing][rate_15m]" - the per-second event rate in a 15-minute sliding window
 #
-# ==== 'timer' values
+# ==== `timer` values
 #
 # For a `timer => [ "thing", "%{duration}" ]` you will receive the following fields:
 #
