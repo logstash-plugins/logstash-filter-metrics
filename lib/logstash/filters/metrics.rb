@@ -192,26 +192,35 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
     # Do nothing if there's nothing to do ;)
     return unless should_flush?
 
-    event = LogStash::Event.new
-    event.set("message", Socket.gethostname)
+    events = []
+
     @metric_meters.each_pair do |name, metric|
+      event = LogStash::Event.new
+      event.set("message", Socket.gethostname)
+      event.set("metric_name", name)
+
       flush_rates event, name, metric
       metric.clear if should_clear?
+      filter_matched(event)
+      events << event
     end
 
     @metric_timers.each_pair do |name, metric|
+      event = LogStash::Event.new
       flush_rates event, name, metric
       # These 4 values are not sliding, so they probably are not useful.
-      event.set("[#{name}][min]", metric.min)
-      event.set("[#{name}][max]", metric.max)
+      event.set("[timers][min]", metric.min)
+      event.set("[timers][max]", metric.max)
       # timer's stddev currently returns variance, fix it.
-      event.set("[#{name}][stddev]", metric.stddev ** 0.5)
-      event.set("[#{name}][mean]", metric.mean)
+      event.set("[timers][stddev]", metric.stddev ** 0.5)
+      event.set("[timers][mean]", metric.mean)
 
       @percentiles.each do |percentile|
-        event.set("[#{name}][p#{percentile}]", metric.snapshot.value(percentile / 100.0))
+        event.set("[timers][p#{percentile}]", metric.snapshot.value(percentile / 100.0))
       end
       metric.clear if should_clear?
+      filter_matched(event)
+      events << event
     end
 
     # Reset counter since metrics were flushed
@@ -224,8 +233,7 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
       @metric_timers.clear
     end
 
-    filter_matched(event)
-    return [event]
+    return events
   end
 
   # this is a temporary fix to enable periodic flushes without using the plugin config:
@@ -240,10 +248,10 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
   private
 
   def flush_rates(event, name, metric)
-      event.set("[#{name}][count]", metric.count)
-      event.set("[#{name}][rate_1m]", metric.one_minute_rate) if @rates.include? 1
-      event.set("[#{name}][rate_5m]", metric.five_minute_rate) if @rates.include? 5
-      event.set("[#{name}][rate_15m]", metric.fifteen_minute_rate) if @rates.include? 15
+      event.set("[rates][count]", metric.count)
+      event.set("[rates][rate_1m]", metric.one_minute_rate) if @rates.include? 1
+      event.set("[rates][rate_5m]", metric.five_minute_rate) if @rates.include? 5
+      event.set("[rates][rate_15m]", metric.fifteen_minute_rate) if @rates.include? 15
   end
 
   def metric_key(key)
