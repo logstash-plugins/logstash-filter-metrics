@@ -1,3 +1,6 @@
+## 4.0.7
+  - Fixed typo in documentation
+
 ## 4.0.6
   - Fixed two minor typos in documentation
 
