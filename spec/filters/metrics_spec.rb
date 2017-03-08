@@ -42,6 +42,11 @@ describe LogStash::Filters::Metrics do
             end
           end
         end
+
+        it "should have host" do
+          insist { subject.length } == 1
+          reject { subject.first.get("host") }.nil?
+        end
       end
 
       context "on the second flush" do
