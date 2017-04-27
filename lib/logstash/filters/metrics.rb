@@ -207,6 +207,7 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
       # timer's stddev currently returns variance, fix it.
       event.set("[#{name}][stddev]", metric.stddev ** 0.5)
       event.set("[#{name}][mean]", metric.mean)
+      event.set("[#{name}][sum]", metric.sum)
 
       @percentiles.each do |percentile|
         event.set("[#{name}][p#{percentile}]", metric.snapshot.value(percentile / 100.0))

@@ -164,6 +164,10 @@ describe LogStash::Filters::Metrics do
       it "should include percentile value" do
         insist { subject.first.get("http_request_time")['p99'] } == 30.0
       end
+
+      it "should include sum value" do
+        insist { subject.first.get("http_request_time")['sum'] } == 60.0
+      end
     end
   end
 
