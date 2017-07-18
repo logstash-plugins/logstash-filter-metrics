@@ -194,11 +194,13 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
 
     event = LogStash::Event.new
     event.set("message", Socket.gethostname)
+    event.set("meters", @metric_meters.keys)
     @metric_meters.each_pair do |name, metric|
       flush_rates event, name, metric
       metric.clear if should_clear?
     end
 
+    event.set("timers", @metric_timers.keys)
     @metric_timers.each_pair do |name, metric|
       flush_rates event, name, metric
       # These 4 values are not sliding, so they probably are not useful.
