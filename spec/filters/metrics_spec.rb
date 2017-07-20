@@ -43,9 +43,9 @@ describe LogStash::Filters::Metrics do
           end
         end
 
-        it "should have host" do
+        it "should have host in message" do
           insist { subject.length } == 1
-          reject { subject.first.get("host") }.nil?
+          reject { subject.first.get("message") }.nil?
         end
       end
 
