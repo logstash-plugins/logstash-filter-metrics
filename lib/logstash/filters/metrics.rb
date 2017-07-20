@@ -195,7 +195,7 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
     return unless should_flush?
 
     event = LogStash::Event.new
-    event.set("host", @host)
+    event.set("message", @host)
     @metric_meters.each_pair do |name, metric|
       flush_rates event, name, metric
       metric.clear if should_clear?
