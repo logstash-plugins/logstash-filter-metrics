@@ -150,6 +150,27 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
   # The percentiles that should be measured and emitted for timer values.
   config :percentiles, :validate => :array, :default => [1, 5, 10, 90, 95, 99, 100]
 
+  # Splits the metric field into a array.
+  #
+  # This is usefull when you dont exactly know how many items there will be in a (array)field.
+  # For example, this option is usefull to track metrics of the tags field:
+  # [source,ruby]
+  #     filter {
+  #       metrics {
+  #         split => true
+  #         split_seperator => ","
+  #         meter => "%{[tags]}"
+  #       }
+  #     }
+  #
+  # For each seperate tag, you'll now have a seperate metric.
+  # Note: This option is only being used if meter is supplied.
+  #       The split doesnt work with timer data.
+  config :split, :validate => :boolean, :default => false
+
+  # The split seperator to use.
+  config :split_seperator, :validate => :string, :default => ','
+
   def register
     require "metriks"
     require "socket"
@@ -177,7 +198,15 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
     end
 
     @meter.each do |m|
-      @metric_meters[event.sprintf(m)].mark
+      if (@split)
+        m = event.sprintf(m).to_s().split(@split_seperator)
+
+        m.each do |value|
+          @metric_meters[value].mark
+        end
+      else
+        @metric_meters[event.sprintf(m)].mark
+      end
     end
 
     @timer.each do |name, value|
