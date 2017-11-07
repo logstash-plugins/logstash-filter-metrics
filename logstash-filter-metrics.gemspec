@@ -1,9 +1,9 @@
 Gem::Specification.new do |s|
 
   s.name            = 'logstash-filter-metrics'
-  s.version         = '4.0.4'
+  s.version         = '4.0.5'
   s.licenses        = ['Apache License (2.0)']
-  s.summary         = "The metrics filter is useful for aggregating metrics."
+  s.summary         = "Aggregates metrics"
   s.description     = "This gem is a Logstash plugin required to be installed on top of the Logstash core pipeline using $LS_HOME/bin/logstash-plugin install gemname. This gem is not a stand-alone program"
   s.authors         = ["Elastic"]
   s.email           = 'info@elastic.co'
