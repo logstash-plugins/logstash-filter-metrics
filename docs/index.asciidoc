@@ -77,7 +77,7 @@ can be configured with the `rates` option.
 
 ==== Example: Computing event rate
 
-For a simple example, let's track how many events per second are running
+For a simple example, let's track how many events per minute are running
 through logstash:
 [source,ruby]
 ----
