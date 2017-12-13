@@ -155,7 +155,7 @@ filter plugins.
   * Value type is <<number,number>>
   * Default value is `-1`
 
-The clear interval, when all counter are reset.
+The clear interval, when all counters are reset.
 
 If set to -1, the default value, the metrics will never be cleared.
 Otherwise, should be a multiple of 5s.
