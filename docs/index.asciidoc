@@ -51,7 +51,7 @@ metric in the following way:
 
 ==== `meter` values
 
-For a `meter => "something"` you will receive the following fields:
+For a `meter => "thing"` you will receive the following fields:
 
 * "[thing][count]" - the total count of events
 * "[thing][rate_1m]" - the per-second event rate in a 1-minute sliding window
