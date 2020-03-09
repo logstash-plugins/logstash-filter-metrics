@@ -1,4 +1,5 @@
 require "logstash/devutils/rspec/spec_helper"
+require "insist"
 require "logstash/filters/metrics"
 
 describe LogStash::Filters::Metrics do
