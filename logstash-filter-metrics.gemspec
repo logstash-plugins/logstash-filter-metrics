@@ -1,9 +1,9 @@
 Gem::Specification.new do |s|
 
   s.name            = 'logstash-filter-metrics'
-  s.version         = '4.0.2'
+  s.version         = '4.0.7'
   s.licenses        = ['Apache License (2.0)']
-  s.summary         = "The metrics filter is useful for aggregating metrics."
+  s.summary         = "Aggregates metrics"
   s.description     = "This gem is a Logstash plugin required to be installed on top of the Logstash core pipeline using $LS_HOME/bin/logstash-plugin install gemname. This gem is not a stand-alone program"
   s.authors         = ["Elastic"]
   s.email           = 'info@elastic.co'
@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   # Files
-  s.files = Dir['lib/**/*','spec/**/*','vendor/**/*','*.gemspec','*.md','CONTRIBUTORS','Gemfile','LICENSE','NOTICE.TXT']
+  s.files = Dir["lib/**/*","spec/**/*","*.gemspec","*.md","CONTRIBUTORS","Gemfile","LICENSE","NOTICE.TXT", "vendor/jar-dependencies/**/*.jar", "vendor/jar-dependencies/**/*.rb", "VERSION", "docs/**/*"]
 
   # Tests
   s.test_files = s.files.grep(%r{^(test|spec|features)/})
@@ -25,4 +25,5 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "thread_safe"
 
   s.add_development_dependency 'logstash-devutils'
+  s.add_development_dependency 'insist'
 end
