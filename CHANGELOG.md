@@ -1,3 +1,12 @@
+## 4.0.6
+  - Fixed two minor typos in documentation
+
+## 4.0.5
+  - Update gemspec summary
+
+## 4.0.4
+  - Fix some documentation issues
+
 ## 4.0.2
   - Relax constraint on logstash-core-plugin-api to >= 1.60 <= 2.99
 

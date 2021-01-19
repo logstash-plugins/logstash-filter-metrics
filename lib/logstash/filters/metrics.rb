@@ -158,6 +158,8 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
     @last_flush = Atomic.new(0) # how many seconds ago the metrics where flushed.
     @last_clear = Atomic.new(0) # how many seconds ago the metrics where cleared.
     @random_key_preffix = SecureRandom.hex
+    # Same as logstash-input-file
+    @host = Socket.gethostname.force_encoding(Encoding::UTF_8)
     unless (@rates - [1, 5, 15]).empty?
       raise LogStash::ConfigurationError, "Invalid rates configuration. possible rates are 1, 5, 15. Rates: #{rates}."
     end
@@ -193,7 +195,7 @@ class LogStash::Filters::Metrics < LogStash::Filters::Base
     return unless should_flush?
 
     event = LogStash::Event.new
-    event.set("message", Socket.gethostname)
+    event.set("message", @host)
     @metric_meters.each_pair do |name, metric|
       flush_rates event, name, metric
       metric.clear if should_clear?

@@ -1,4 +1,5 @@
 require "logstash/devutils/rspec/spec_helper"
+require "insist"
 require "logstash/filters/metrics"
 
 describe LogStash::Filters::Metrics do
@@ -41,6 +42,11 @@ describe LogStash::Filters::Metrics do
               insist { subject.first.get(meter) }.include? rate
             end
           end
+        end
+
+        it "should have host in message" do
+          insist { subject.length } == 1
+          reject { subject.first.get("message") }.nil?
         end
       end
 
