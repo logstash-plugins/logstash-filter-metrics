@@ -75,6 +75,9 @@ For a `timer => { "thing" => "%{duration}" }` you will receive the following fie
 The default lengths of the event rate window (1, 5, and 15 minutes)
 can be configured with the `rates` option.
 
+IMPORTANT: When using several `metrics` filters (in particular the `timer`), it might
+become necessary to increase the `Xss` setting in `jvm.options` to avoid `StackOverflowException`.
+
 ==== Example: Computing event rate
 
 For a simple example, let's track how many events per second are running
